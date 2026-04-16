@@ -1,5 +1,5 @@
 """
-mcp_vuln_server.py — MCP vulnerability analysis server
+MCP vulnerability analysis server
 =======================================================
 Exposes three tools via the MCP protocol (fastmcp):
 
@@ -545,8 +545,6 @@ def suggest_mitigations(
         fn_name   = result.get("function", "unknown")
         fn_source = result.get("source", "")
 
-        # Try to recover source from the report if not stored
-        # (save_json_report doesn't include raw source — fall back gracefully)
         if not fn_source:
             target = Path(report.get("meta", {}).get("target", ""))
             if target.exists():
@@ -626,17 +624,6 @@ def suggest_mitigations(
         "min_severity_filter": min_severity,
     }
 
-
-# ── Entry point ────────────────────────────────────────────────────────────────
-# if __name__ == "__main__":
-#     print("Starting MCP vulnerability server...")
-#     print(f"  Chunks zip  : {CONFIG['chunks_zip']}")
-#     print(f"  Ollama URL  : {CONFIG['ollama_url']}")
-#     print(f"  Ollama model: {CONFIG['ollama_model']}")
-#     print(f"  SecLists    : {CONFIG['seclists_path']}")
-#     print(f"  Report path : {CONFIG['report_path']}")
-#     print()
-#     mcp.run()
 
 if __name__ == "__main__":
     print("Starting MCP vulnerability server...", file=sys.stderr)
