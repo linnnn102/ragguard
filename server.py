@@ -20,22 +20,18 @@ Configuration (edit CONFIG block below or set env vars):
 """
 
 import os
+import sys
 import json
 import time
 import subprocess
-import tempfile
 from pathlib import Path
 from typing import Optional
 
-import requests
-import numpy as np
-import pandas as pd
 from fastmcp import FastMCP
 
 # ── reuse scanner internals ────────────────────────────────────────────────────
 # Import everything we already built in vuln_scanner.py.
-# Place mcp_vuln_server.py in the same folder as vuln_scanner.py.
-from vuln_scanner_bf_dot import (
+from vuln_scanner import (
     KnowledgeBase,
     OllamaClient,
     extract_functions,
@@ -67,33 +63,27 @@ CWE_WORDLIST_MAP = {
         "Fuzzing/Databases/SQLi/Generic-SQLi.txt",
     ],
     "CWE-79":  [
-        "Fuzzing/XSS/XSS-Jhaddix.txt",
-        "Fuzzing/XSS/XSS-BruteLogic.txt",
+        "Fuzzing/XSS/human-friendly/XSS-Jhaddix.txt",
+        "Fuzzing/XSS/robot-friendly/XSS-Jhaddix.txt",
+        "Fuzzing/XSS/human-friendly/XSS-BruteLogic.txt",
+        "Fuzzing/XSS/robot-friendly/XSS-BruteLogic.txt",
     ],
     "CWE-78":  [
         "Fuzzing/command-injection-commix.txt",
     ],
     "CWE-22":  [
-        "Fuzzing/LFI/LFI-gracefulsecurity-linux.txt",
+        "Fuzzing/LFI/Linux/LFI-gracefulsecurity-linux.txt",
         "Fuzzing/LFI/LFI-LFISuite-pathtotest-huge.txt",
     ],
-    "CWE-287": [
-        "Fuzzing/Authentication/Authentication.txt",
-    ],
-    "CWE-352": [
-        "Fuzzing/CSRF/CSRF-token-wordlist.txt",
-    ],
-    "CWE-434": [
-        "Fuzzing/Extensions.fuzz.txt",
-    ],
+    # "CWE-287": [
+    # "CWE-352": [
+    # "CWE-434": [
+    # "CWE-918": [
     "CWE-502": [
-        "Fuzzing/Polyglots/Polyglots.txt",
-    ],
-    "CWE-918": [
-        "Fuzzing/SSRF/SSRF-targets.txt",
+        "Fuzzing/XSS/Polyglots/XSS-Polyglots.txt",
     ],
     "CWE-20":  [
-        "Fuzzing/Polyglots/Polyglots.txt",
+        "Fuzzing/XSS/Polyglots/XSS-Polyglots.txt",
         "Fuzzing/special-chars.txt",
     ],
     # Fallback for unmapped CWEs
@@ -608,7 +598,7 @@ def suggest_mitigations(
                     try:
                         parsed = json.loads(match.group())
                     except json.JSONDecodeError:
-                        pass
+                        parsed = None
 
             if parsed and isinstance(parsed, dict):
                 mitigations.append({
@@ -638,12 +628,22 @@ def suggest_mitigations(
 
 
 # ── Entry point ────────────────────────────────────────────────────────────────
+# if __name__ == "__main__":
+#     print("Starting MCP vulnerability server...")
+#     print(f"  Chunks zip  : {CONFIG['chunks_zip']}")
+#     print(f"  Ollama URL  : {CONFIG['ollama_url']}")
+#     print(f"  Ollama model: {CONFIG['ollama_model']}")
+#     print(f"  SecLists    : {CONFIG['seclists_path']}")
+#     print(f"  Report path : {CONFIG['report_path']}")
+#     print()
+#     mcp.run()
+
 if __name__ == "__main__":
-    print("Starting MCP vulnerability server...")
-    print(f"  Chunks zip  : {CONFIG['chunks_zip']}")
-    print(f"  Ollama URL  : {CONFIG['ollama_url']}")
-    print(f"  Ollama model: {CONFIG['ollama_model']}")
-    print(f"  SecLists    : {CONFIG['seclists_path']}")
-    print(f"  Report path : {CONFIG['report_path']}")
-    print()
+    print("Starting MCP vulnerability server...", file=sys.stderr)
+    print(f"  Chunks zip  : {CONFIG['chunks_zip']}", file=sys.stderr)
+    print(f"  Ollama URL  : {CONFIG['ollama_url']}", file=sys.stderr)
+    print(f"  Ollama model: {CONFIG['ollama_model']}", file=sys.stderr)
+    print(f"  SecLists    : {CONFIG['seclists_path']}", file=sys.stderr)
+    print(f"  Report path : {CONFIG['report_path']}", file=sys.stderr)
+    print(file=sys.stderr)
     mcp.run()
